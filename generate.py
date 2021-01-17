@@ -24,9 +24,13 @@ generate_homepage()
 
 def generate_homepage():
 	welcome_content_file = content_directory + '/index.txt'
-	preview_1_content_file = ""
-	preview_2_content_file = ""
-	post_content_file = ""
+	preview_1_content_file = content_directory + '/story/1.txt'
+
+	latest_essay_filename = get_greatest_lexicographic_filename(content_directory + '/essays')
+	preview_2_content_file = content_directory + '/essays/' + latest_essay_filename
+
+	latest_blog_post_filename = get_greatest_lexicographic_filename(content_directory + '/blog-posts')
+	post_content_file = content_directory + '/blog-posts/' + latest_blog_post_filename
 
 	welcome_content = get_content(welcome_content_file)
 	preview_1_content = get_content(preview_1_content_file)
@@ -37,7 +41,12 @@ def generate_homepage():
 		html = create_home_html(welcome_content, preview_1_content, preview_2_content, post_content)
 		home_html_file.write(html)
 
-def create_home_html(welcome_content_file, preview_1_content_file, preview_2_content_file, post_content_file):
+def get_greatest_lexicographic_filename(directory_path):
+	filenames = os.listdir(directory_path)
+	filenames.sort()
+	return filenames[-1]
+
+def create_home_html(welcome_content, preview_1_content, preview_2_content, post_content):
 	page_title = 'Blaine Believes · Home'
 
 	html_string = '<!doctype html>'
@@ -48,10 +57,7 @@ def create_home_html(welcome_content_file, preview_1_content_file, preview_2_con
 	return html_string
 
 def create_head_element(title):
-	head_string = ""
-	with open("./templates/head.html") as head_template_file:
-		head_string = head_template_file.read()
-	head_string = minify_html(head_string)
+	head_string = get_template_string("./templates/head.html")
 	head_string = head_string.replace("<title></title>", "<title>{}</title>".format(title))
 	return head_string
 
@@ -67,6 +73,18 @@ def create_home_body_element(welcome, preview_1, preview_2, post):
 	body_string += create_footer_element()
 	body_string += '</body>'
 	return body_string
+
+def create_header_element():
+	return get_template_string("./templates/header.html")
+
+def create_nav_element():
+	return get_template_string("./templates/nav.html")
+
+def get_template_string(filename):
+	template = ""
+	with open(filename) as file:
+		template = file.read()
+	return minify_html(template)
 
 def get_content(filename):
 	content = []

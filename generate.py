@@ -58,7 +58,7 @@ def create_home_html(welcome_content, preview_1_content, preview_2_content, post
 
 def create_head_element(title):
 	head_string = get_template_string("./templates/head.html")
-	head_string = head_string.replace("<title></title>", "<title>{}</title>".format(title))
+	head_string = head_string.replace("##title##", title)
 	return head_string
 
 def create_home_body_element(welcome, preview_1, preview_2, post):
@@ -66,8 +66,8 @@ def create_home_body_element(welcome, preview_1, preview_2, post):
 	body_string += '<div class="container">'
 	body_string += create_header_element()
 	body_string += create_nav_element()
-	body_string += create_welcome_banner(welcome_content)
-	body_string += create_row(create_preview_block(preview_1), create_preview_block(preview_2))
+	body_string += create_welcome_banner(welcome)
+	body_string += create_preview_row(preview_1, "My Story", preview_2, "Essays")
 	body_string += '</div>'
 	body_string += create_main_element(post)
 	body_string += create_footer_element()
@@ -80,6 +80,27 @@ def create_header_element():
 def create_nav_element():
 	return get_template_string("./templates/nav.html")
 
+def create_welcome_banner(content):
+	banner_string = get_template_string("./templates/welcome-banner.html")
+	banner_string = banner_string.replace("##h1##", content[0])
+	banner_string = banner_string.replace("##p##", content[1])
+	return banner_string
+
+def create_preview_row(element1, heading1, element2, heading2):
+	row_string = get_template_string("./templates/preview-row.html")
+	row_string = row_string.replace("##heading1##", heading1)
+	row_string = row_string.replace("##title1##", element1[0])
+	row_string = row_string.replace("##text1##", truncate_string(element1[1]))
+	row_string = row_string.replace("##heading2##", heading2)
+	row_string = row_string.replace("##title2##", element2[0])
+	row_string = row_string.replace("##text2##", truncate_string(element2[1]))
+	return row_string
+
+def create_main_element(main_content):
+	main_string = get_template_string("./templates/main.html")
+	main_string = main_string.replace("##content##", main_content)
+	return main_string
+
 def get_template_string(filename):
 	template = ""
 	with open(filename) as file:
@@ -87,12 +108,22 @@ def get_template_string(filename):
 	return minify_html(template)
 
 def get_content(filename):
-	content = []
+	lines = []
 	with open(filename) as file:
-		content = file.readlines()
+		lines = file.readlines()
+	content = []
+	for line in lines:
+		if line != "\n":
+			content.append(line)
 	return content
 
 def minify_html(html_string):
 	minified = html_string.replace('\n', '')
 	minified = minified.replace('\t', '')
 	return minified
+
+def truncate_string(str):
+	if str.length > 100:
+		return str[:95] + ". . ."
+	else:
+		return str

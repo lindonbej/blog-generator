@@ -2,32 +2,33 @@ import os
 import sys
 import shutil
 
-content_directory = sys.argv[1]
+def generate_site_files():
+	content_directory = sys.argv[1]
 
-if os.path.isdir("./dist"):
-	shutil.rmtree("./dist")
+	if os.path.isdir("./dist"):
+		shutil.rmtree("./dist")
 
-os.mkdir("./dist")
-os.mkdir("./dist/about")
-os.mkdir("./dist/blog")
-os.mkdir("./dist/story")
-os.mkdir("./dist/essays")
+	os.mkdir("./dist")
+	os.mkdir("./dist/about")
+	os.mkdir("./dist/blog")
+	os.mkdir("./dist/story")
+	os.mkdir("./dist/essays")
 
-generate_homepage()
+	generate_homepage(content_directory)
+	# create about folder
+	# create blog folder
+	# create essays folder
+	# create story folder
+	shutil.copy("./css/blog.css", "./dist")
+	shutil.copy("/css/bootstrap.min.css", "./dist")
 
-# create index.html
-# create about folder
-# create blog folder
-# create essays folder
-# create story folder
-# copy css files
-
-def generate_homepage():
+def generate_homepage(content_directory):
 	welcome_content_file = content_directory + '/index.txt'
 	preview_1_content_file = content_directory + '/story/1.txt'
 
-	latest_essay_filename = get_greatest_lexicographic_filename(content_directory + '/essays')
-	preview_2_content_file = content_directory + '/essays/' + latest_essay_filename
+	# latest_essay_filename = get_greatest_lexicographic_filename(content_directory + '/essays')
+	# preview_2_content_file = content_directory + '/essays/' + latest_essay_filename
+	preview_2_content_file = content_directory + '/essays/placeholder.txt'
 
 	latest_blog_post_filename = get_greatest_lexicographic_filename(content_directory + '/blog-posts')
 	post_content_file = content_directory + '/blog-posts/' + latest_blog_post_filename
@@ -37,13 +38,16 @@ def generate_homepage():
 	preview_2_content = get_content(preview_2_content_file)
 	post_content = get_content(post_content_file)
 
+	html = create_home_html(welcome_content, preview_1_content, preview_2_content, post_content)
+
 	with open("./dist/index.html", "w") as home_html_file:
-		html = create_home_html(welcome_content, preview_1_content, preview_2_content, post_content)
 		home_html_file.write(html)
 
 def get_greatest_lexicographic_filename(directory_path):
 	filenames = os.listdir(directory_path)
 	filenames.sort()
+	if len(filenames) == 0:
+		return None
 	return filenames[-1]
 
 def create_home_html(welcome_content, preview_1_content, preview_2_content, post_content):
@@ -101,6 +105,9 @@ def create_main_element(main_content):
 	main_string = main_string.replace("##content##", main_content)
 	return main_string
 
+def create_footer_element():
+	return get_template_string("./templates/footer.html")
+
 def get_template_string(filename):
 	template = ""
 	with open(filename) as file:
@@ -127,3 +134,6 @@ def truncate_string(str):
 		return str[:95] + ". . ."
 	else:
 		return str
+
+if __name__ == "__main__":
+	generate_site_files()

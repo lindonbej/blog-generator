@@ -73,7 +73,8 @@ def create_home_body_element(welcome, preview_1, preview_2, post):
 	body_string += create_welcome_banner(welcome)
 	body_string += create_preview_row(preview_1, "My Story", preview_2, "Essays")
 	body_string += '</div>'
-	body_string += create_main_element(post)
+	# FIXME: use datetime.date class to implement parse_date
+	body_string += create_main_element(post[0], parse_date(post[1]), post[2:])
 	body_string += create_footer_element()
 	body_string += '</body>'
 	return body_string
@@ -100,9 +101,9 @@ def create_preview_row(element1, heading1, element2, heading2):
 	row_string = row_string.replace("##text2##", truncate_string(element2[1]))
 	return row_string
 
-def create_main_element(main_content):
+def create_main_element(title, meta, content):
 	main_string = get_template_string("./templates/main.html")
-	main_string = main_string.replace("##content##", main_content)
+	# TODO: implement me!
 	return main_string
 
 def create_footer_element():

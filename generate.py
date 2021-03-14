@@ -130,7 +130,7 @@ def minify_html(html_string):
 	return minified
 
 def truncate_string(str):
-	if str.length > 100:
+	if len(str) > 100:
 		return str[:95] + ". . ."
 	else:
 		return str
